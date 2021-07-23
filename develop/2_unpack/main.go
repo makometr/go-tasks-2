@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -34,14 +35,16 @@ func unpakcing(str string) (string, error) {
 
 func getCodePair(str string, index int) (codePair, int, error) {
 	word, wordSize := utf8.DecodeRuneInString(str[index:])
-	if !unicode.IsLetter(word) {
-		return codePair{}, 0, &strconv.NumError{}
+	if !unicode.IsLetter(word) && int(word) != 92 {
+		return codePair{}, 0, fmt.Errorf("not expexted %d %c", word, word)
+	}
+
+	if int(word) == 92 {
+		slashedWord, slashedwordSize := utf8.DecodeRuneInString(str[index+wordSize:])
+		return codePair{char: slashedWord, length: 1}, index + wordSize + slashedwordSize, nil
 	}
 
 	indexNumberBegin := index + wordSize
-	if indexNumberBegin >= len(str) {
-		return codePair{word, 1}, indexNumberBegin, nil
-	}
 	indexNumberEnd := strings.IndexFunc(str[indexNumberBegin:], func(r rune) bool {
 		return !unicode.IsDigit(r)
 	})

@@ -55,6 +55,21 @@ func Test_unpakcing(t *testing.T) {
 			want:    "",
 			wantErr: true,
 		},
+		{
+			name: "Escape - 1",
+			args: args{str: `qwe\4\5`},
+			want: "qwe45",
+		},
+		// {
+		// 	name: "Escape - 2",
+		// 	args: args{str: `qwe\45`},
+		// 	want: "qwe44444",
+		// },
+		// {
+		// 	name: "Escape - 3",
+		// 	args: args{str: `qwe\\5`},
+		// 	want: `qwe\\\\\`,
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
