@@ -2,7 +2,7 @@ package basedevelop
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/beevik/ntp"
 )
@@ -11,7 +11,7 @@ import (
 func PrintCurrentTime() {
 	time, err := ntp.Time("0.beevik-ntp.pool.ntp.org")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error! ", err)
+		log.Fatalln("Error!", err)
 	}
 
 	fmt.Println("Current time:", time)
