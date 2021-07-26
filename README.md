@@ -5,7 +5,7 @@ Tasks stage #2
 ## Паттерны проектирования
 
 - [ ] Facade
-- [ ] Builder
+- [x] Builder
 - [ ] Visitor
 - [ ] Command
 - [ ] Chain Responsibility
