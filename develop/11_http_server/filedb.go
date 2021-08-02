@@ -76,7 +76,7 @@ func (db *fileDB) addEvent(e eventQueryOptions) error {
 		newID := db.genNextID()
 		e.ID = &newID
 	}
-	db.data = append(db.data, Event{ID: *e.ID, userID: *e.userID, name: *e.name, date: *e.date})
+	db.data = append(db.data, Event{ID: *e.ID, UserID: *e.userID, Name: *e.name, Date: *e.date})
 	return nil
 }
 
@@ -91,13 +91,13 @@ func (db *fileDB) updateEvent(e eventQueryOptions) (bool, error) {
 	for i := 0; i < len(db.data); i++ {
 		if db.data[i].ID == *e.ID {
 			if e.date != nil {
-				db.data[i].date = *e.date
+				db.data[i].Date = *e.date
 			}
 			if e.userID != nil {
-				db.data[i].userID = *e.userID
+				db.data[i].UserID = *e.userID
 			}
 			if e.name != nil {
-				db.data[i].userID = *e.userID
+				db.data[i].UserID = *e.userID
 			}
 			return true, nil
 		}

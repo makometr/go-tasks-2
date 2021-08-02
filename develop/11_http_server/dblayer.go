@@ -3,6 +3,8 @@ package main
 type dataEventManipulator interface {
 	openConnection() error
 	closeConnction() error
+	readEvents() ([]Event, error)
+	writeEvents([]Event) error
 
 	addEvent(eventQueryOptions) error
 	updateEvent(eventQueryOptions) (bool, error)
