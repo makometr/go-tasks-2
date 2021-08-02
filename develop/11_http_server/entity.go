@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 )
@@ -27,20 +28,35 @@ func newEvent(ID, userID int, name string, date CalendarDay) *Event {
 	return &Event{ID: ID, UserID: userID, Name: name, Date: date}
 }
 
+func (e Event) toJSON() ([]byte, error) {
+	return json.Marshal(e)
+}
+
+func (e *Event) fromJSON(b []byte) error {
+	return json.Unmarshal(b, e)
+}
+
 type EventStorage struct {
 	data   []Event
 	lastID int
 	rwm    sync.RWMutex
 }
 
-func newEventStorage(oldEvents []Event) *EventStorage {
-	var maxID int
+func (es *EventStorage) getNewID() int {
+	defer func() {
+		es.lastID++
+	}()
+	return es.lastID
+}
+
+func (es *EventStorage) initEventStorage(oldEvents []Event) {
 	for i := 0; i < len(oldEvents); i++ {
-		if maxID < oldEvents[i].ID {
-			maxID = oldEvents[i].ID
+		if es.lastID < oldEvents[i].ID {
+			es.lastID = oldEvents[i].ID
 		}
 	}
-	return &EventStorage{data: oldEvents, lastID: maxID, rwm: sync.RWMutex{}}
+	es.data = oldEvents
+	es.rwm = sync.RWMutex{}
 }
 
 func (es *EventStorage) getEvent(ID int) (Event, error) {
@@ -54,15 +70,11 @@ func (es *EventStorage) getEvent(ID int) (Event, error) {
 	return es.data[index], nil
 }
 
-func (es *EventStorage) addEvent(e Event) error {
+func (es *EventStorage) addEvent(data DataToAddNewEvent) error {
 	es.rwm.Lock()
 	defer es.rwm.Unlock()
 
-	if e.ID >= es.lastID {
-		return fmt.Errorf("invalid ID")
-	}
-	es.data = append(es.data, e)
-	es.lastID = e.ID
+	es.data = append(es.data, Event{ID: es.getNewID(), UserID: data.UserID, Name: data.Name, Date: CalendarDay{}})
 
 	return nil
 }
