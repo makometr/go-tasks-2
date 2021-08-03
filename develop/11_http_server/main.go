@@ -27,10 +27,10 @@ func (app *application) initDateStorage(cfg *config.Config) {
 }
 
 func (app *application) initHTTPServer(cfg *config.Config) {
-	http.HandleFunc("/event", app.getEvent)
-	http.HandleFunc("/create_event", app.AddEvent)
-	http.HandleFunc("/update_event", app.UpdateEvent)
-	http.HandleFunc("/delete_event", app.DeleteEvent)
+	http.Handle("/event", logMiddleware(http.HandlerFunc(app.getEvent)))
+	http.Handle("/create_event", logMiddleware(http.HandlerFunc(app.AddEvent)))
+	http.Handle("/update_event", logMiddleware(http.HandlerFunc(app.UpdateEvent)))
+	http.Handle("/delete_event", logMiddleware(http.HandlerFunc(app.DeleteEvent)))
 	// http.HandleFunc("/events_for_day", app.Hello)
 	// http.HandleFunc("/events_for_week", app.Hello)
 	// http.HandleFunc("/events_for_month", app.Hello)
