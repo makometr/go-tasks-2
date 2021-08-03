@@ -16,40 +16,6 @@ type Event struct {
 	Date   string `json:"date"`
 }
 
-// func (e *Event) MarshalJSON() ([]byte, error) {
-// 	buffer := struct {
-// 		ID     int    `json:"id"`
-// 		UserID int    `json:"user_id"`
-// 		Name   string `json:"name"`
-// 		Date   string `json:"date"`
-// 	}{
-// 		ID:     e.ID,
-// 		UserID: e.UserID,
-// 		Name:   e.Name,
-// 		Date:   e.Date.String(),
-// 	}
-// 	return json.Marshal(&buffer)
-// }
-
-// func (e *Event) UnmarshalJSON(b []byte) error {
-// 	var buffer struct {
-// 		ID     int    `json:"id"`
-// 		UserID int    `json:"user_id"`
-// 		Name   string `json:"name"`
-// 		Date   string `json:"date"`
-// 	}
-// 	err := json.Unmarshal(b, &buffer)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	e.ID = buffer.ID
-// 	e.UserID = buffer.UserID
-// 	e.Name = buffer.Name
-// 	e.Date = *NewCalendarDatFromString(buffer.Date)
-// 	return nil
-// }
-
 type eventcontextKey int
 
 const (
@@ -90,6 +56,7 @@ func (es *EventStorage) initEventStorage(oldEvents []Event) {
 		}
 	}
 	es.data = oldEvents
+	es.lastID = 1
 	es.rwm = sync.RWMutex{}
 }
 

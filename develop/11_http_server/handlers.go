@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (app *application) getEvent(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +39,16 @@ type DataToAddNewEvent struct {
 	Date   string `json:"date"`
 }
 
+func (d DataToAddNewEvent) isValid() bool {
+	if d.UserID <= 0 || d.Name == "" {
+		return false
+	}
+	if _, err := time.Parse("2006-01-02", d.Date); err != nil {
+		return false
+	}
+	return true
+}
+
 func (app *application) AddEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.NotFound(w, r)
@@ -50,6 +61,11 @@ func (app *application) AddEvent(w http.ResponseWriter, r *http.Request) {
 		sendResponse(w, http.StatusBadRequest, nil)
 		return
 	}
+	if !t.isValid() {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
 	ID, err := app.events.addEvent(t)
 	if err != nil {
 		sendResponse(w, http.StatusBadRequest, nil)
@@ -67,6 +83,16 @@ type DataToUpdateEvent struct {
 	Date   string `json:"date"`
 }
 
+func (d DataToUpdateEvent) isValid() bool {
+	if d.ID <= 0 || d.UserID <= 0 || d.Name == "" {
+		return false
+	}
+	if _, err := time.Parse("2006-01-02", d.Date); err != nil {
+		return false
+	}
+	return true
+}
+
 func (app *application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		http.NotFound(w, r)
@@ -76,6 +102,10 @@ func (app *application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	var t DataToUpdateEvent
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	if !t.isValid() {
 		sendResponse(w, http.StatusBadRequest, nil)
 		return
 	}
