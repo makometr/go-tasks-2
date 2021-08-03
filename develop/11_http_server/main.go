@@ -31,9 +31,11 @@ func (app *application) initHTTPServer(cfg *config.Config) {
 	http.Handle("/create_event", logMiddleware(http.HandlerFunc(app.AddEvent)))
 	http.Handle("/update_event", logMiddleware(http.HandlerFunc(app.UpdateEvent)))
 	http.Handle("/delete_event", logMiddleware(http.HandlerFunc(app.DeleteEvent)))
-	// http.HandleFunc("/events_for_day", app.Hello)
-	// http.HandleFunc("/events_for_week", app.Hello)
-	// http.HandleFunc("/events_for_month", app.Hello)
+
+	http.Handle("/events_for_day", logMiddleware(http.HandlerFunc(app.getEventsForDay)))
+	http.Handle("/events_for_week", logMiddleware(http.HandlerFunc(app.getEventsForWeek)))
+	http.Handle("/events_for_month", logMiddleware(http.HandlerFunc(app.getEventsForMonth)))
+	http.Handle("/events_for_year", logMiddleware(http.HandlerFunc(app.getEventsForYear)))
 	app.server = &http.Server{Addr: cfg.Port, Handler: http.DefaultServeMux}
 
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 )
 
 // TODO rename file to module entity
@@ -125,6 +126,54 @@ func (es *EventStorage) findIndex(ID int) (int, error) {
 		}
 	}
 	return 0, fmt.Errorf("no event with sucn index")
+}
+
+func (es *EventStorage) findByDay(day time.Time) ([]Event, error) {
+	var found []Event
+	for i := 0; i < len(es.data); i++ {
+		curDay, _ := time.Parse("2006-01-02", es.data[i].Date)
+		if day.Year() == curDay.Year() && day.YearDay() == curDay.YearDay() {
+			found = append(found, es.data[i])
+		}
+	}
+	return found, nil
+}
+
+func (es *EventStorage) findByWeek(week time.Time) ([]Event, error) {
+	var found []Event
+	yearToFind, weekToFind := week.ISOWeek()
+	for i := 0; i < len(es.data); i++ {
+		curDay, _ := time.Parse("2006-01-02", es.data[i].Date)
+		yearCur, weekCur := curDay.ISOWeek()
+		if yearToFind == yearCur && weekToFind == weekCur {
+			found = append(found, es.data[i])
+		}
+	}
+	return found, nil
+}
+
+func (es *EventStorage) findByMonth(month time.Time) ([]Event, error) {
+	var found []Event
+	yearToFind, monthToFind := month.Year(), month.Month()
+	for i := 0; i < len(es.data); i++ {
+		curData, _ := time.Parse("2006-01-02", es.data[i].Date)
+		yearCur, monthCur := curData.Year(), curData.Month()
+		if yearToFind == yearCur && monthToFind == monthCur {
+			found = append(found, es.data[i])
+		}
+	}
+	return found, nil
+}
+
+func (es *EventStorage) findByYear(year int) ([]Event, error) {
+	var found []Event
+	for i := 0; i < len(es.data); i++ {
+		curDay, _ := time.Parse("2006-01-02", es.data[i].Date)
+		if year == curDay.Year() {
+			found = append(found, es.data[i])
+		}
+	}
+	return found, nil
 }
 
 // TODO check нужен ли мютекс

@@ -154,6 +154,110 @@ func (app *application) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	sendResponse(w, http.StatusOK, deleted)
 }
 
+func (app *application) getEventsForDay(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	dayStr, ok := r.URL.Query()["day"]
+	if !ok {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	day, err := time.Parse("2006-01-02", dayStr[0])
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	events, err := app.events.findByDay(day)
+	if err != nil {
+		sendResponse(w, http.StatusOK, nil)
+		return
+	}
+
+	sendResponse(w, http.StatusOK, events)
+}
+
+func (app *application) getEventsForWeek(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	weekStr, ok := r.URL.Query()["week"]
+	if !ok {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	week, err := time.Parse("2006-01-02", weekStr[0])
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	events, err := app.events.findByWeek(week)
+	if err != nil {
+		sendResponse(w, http.StatusOK, nil)
+		return
+	}
+
+	sendResponse(w, http.StatusOK, events)
+}
+
+func (app *application) getEventsForMonth(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	weekStr, ok := r.URL.Query()["month"]
+	if !ok {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	week, err := time.Parse("2006-01-02", weekStr[0])
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	events, err := app.events.findByMonth(week)
+	if err != nil {
+		sendResponse(w, http.StatusOK, nil)
+		return
+	}
+
+	sendResponse(w, http.StatusOK, events)
+}
+
+func (app *application) getEventsForYear(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	yearStr, ok := r.URL.Query()["year"]
+	if !ok {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	year, err := strconv.Atoi(yearStr[0])
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	events, err := app.events.findByYear(year)
+	if err != nil {
+		sendResponse(w, http.StatusOK, nil)
+		return
+	}
+
+	sendResponse(w, http.StatusOK, events)
+}
+
 func sendResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(code)
