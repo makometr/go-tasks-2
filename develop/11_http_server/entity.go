@@ -108,6 +108,16 @@ func (es *EventStorage) updateEvent(ID int, ctx context.Context) error {
 	return nil
 }
 
+func (es *EventStorage) DeleteEvent(ID int) error {
+	index, err := es.findIndex(ID)
+	if err != nil {
+		return err
+	}
+
+	es.data = append(es.data[:index], es.data[:index]...)
+	return nil
+}
+
 func (es *EventStorage) findIndex(ID int) (int, error) {
 	for i := 0; i < len(es.data); i++ {
 		if es.data[i].ID == ID {
