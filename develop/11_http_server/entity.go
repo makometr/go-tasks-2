@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -14,6 +16,40 @@ type Event struct {
 	UserID int
 	Name   string
 	Date   CalendarDay
+}
+
+func (e *Event) MarshalJSON() ([]byte, error) {
+	buffer := struct {
+		ID     int    `json:"id"`
+		UserID int    `json:"user_id"`
+		Name   string `json:"name"`
+		Date   string `json:"date"`
+	}{
+		ID:     e.ID,
+		UserID: e.UserID,
+		Name:   e.Name,
+		Date:   e.Date.String(),
+	}
+	return json.Marshal(&buffer)
+}
+
+func (e *Event) UnmarshalJSON(b []byte) error {
+	var buffer struct {
+		ID     int    `json:"id"`
+		UserID int    `json:"user_id"`
+		Name   string `json:"name"`
+		Date   string `json:"date"`
+	}
+	err := json.Unmarshal(b, &buffer)
+	if err != nil {
+		return err
+	}
+
+	e.ID = buffer.ID
+	e.UserID = buffer.UserID
+	e.Name = buffer.Name
+	e.Date = *NewCalendarDatFromString(buffer.Date)
+	return nil
 }
 
 type eventcontextKey int
@@ -74,7 +110,7 @@ func (es *EventStorage) addEvent(data DataToAddNewEvent) error {
 	es.rwm.Lock()
 	defer es.rwm.Unlock()
 
-	es.data = append(es.data, Event{ID: es.getNewID(), UserID: data.UserID, Name: data.Name, Date: CalendarDay{}})
+	es.data = append(es.data, Event{ID: es.getNewID(), UserID: data.UserID, Name: data.Name, Date: *NewCalendarDatFromString(data.Date)})
 
 	return nil
 }
@@ -133,4 +169,34 @@ type CalendarDay struct {
 	day  int
 	week int
 	year int
+}
+
+func (cd CalendarDay) String() string {
+	return fmt.Sprintf("%d.%d.%d", cd.day, cd.week, cd.year)
+}
+
+func NewCalendarDatFromString(s string) *CalendarDay {
+	numbers := strings.Split(s, ".")
+	if len(numbers) != 3 {
+		return &CalendarDay{}
+	}
+
+	day, err := strconv.Atoi(numbers[0])
+	if err != nil {
+		return &CalendarDay{}
+	}
+	week, err := strconv.Atoi(numbers[1])
+	if err != nil {
+		return &CalendarDay{}
+	}
+	year, err := strconv.Atoi(numbers[2])
+	if err != nil {
+		return &CalendarDay{}
+	}
+
+	var cd CalendarDay
+	cd.day = day
+	cd.week = week
+	cd.year = year
+	return &cd
 }

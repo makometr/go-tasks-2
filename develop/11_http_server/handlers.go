@@ -7,7 +7,13 @@ import (
 )
 
 func (app *application) getEvent(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "get event\n")
+	eventID, ok := r.URL.Query()["id"]
+	if !ok {
+		encoder := json.NewEncoder(w)
+		encoder.Encode(app.events.data)
+		return
+	}
+	fmt.Fprintf(w, "get event %v\n", eventID)
 }
 
 type DataToAddNewEvent struct {

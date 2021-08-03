@@ -29,7 +29,7 @@ func (db *fileDB) openConnection() ([]Event, error) {
 
 	for decoder.More() {
 		var e Event
-		decoder.Decode(&events)
+		decoder.Decode(&e)
 		events = append(events, e)
 	}
 
