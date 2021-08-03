@@ -64,9 +64,6 @@ func main() {
 	app.initHTTPServer(cfg)
 	defer app.Shutdown()
 
-	// fmt.Println(time.Time.ISOWeek(time.Now()))
-	// fmt.Println(time.Time.YearDay(time.Now()))
-
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, syscall.SIGINT, syscall.SIGTERM)
 	serverErrors := make(chan error, 1)

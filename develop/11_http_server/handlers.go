@@ -21,12 +21,12 @@ func (app *application) getEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	eventID, err := strconv.Atoi(eventIDs[0])
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	index, err := app.events.findIndex(eventID)
 	if err != nil {
-		sendResponse(w, http.StatusOK, nil)
+		sendError(w, http.StatusOK, nil)
 		return
 	}
 
@@ -58,17 +58,17 @@ func (app *application) AddEvent(w http.ResponseWriter, r *http.Request) {
 	var t DataToAddNewEvent
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	if !t.isValid() {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	ID, err := app.events.addEvent(t)
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 	}
 
 	sendResponse(w, http.StatusOK, struct {
@@ -102,11 +102,11 @@ func (app *application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	var t DataToUpdateEvent
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	if !t.isValid() {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (app *application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 
 	updated, err := app.events.updateEvent(t.ID, ctx)
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	sendResponse(w, http.StatusOK, updated)
@@ -142,13 +142,13 @@ func (app *application) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	var t DataToDeleteEvent
 	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	deleted, err := app.events.DeleteEvent(t.ID)
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	sendResponse(w, http.StatusOK, deleted)
@@ -162,18 +162,18 @@ func (app *application) getEventsForDay(w http.ResponseWriter, r *http.Request) 
 
 	dayStr, ok := r.URL.Query()["day"]
 	if !ok {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	day, err := time.Parse("2006-01-02", dayStr[0])
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	events, err := app.events.findByDay(day)
 	if err != nil {
-		sendResponse(w, http.StatusOK, nil)
+		sendError(w, http.StatusOK, nil)
 		return
 	}
 
@@ -188,18 +188,18 @@ func (app *application) getEventsForWeek(w http.ResponseWriter, r *http.Request)
 
 	weekStr, ok := r.URL.Query()["week"]
 	if !ok {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	week, err := time.Parse("2006-01-02", weekStr[0])
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	events, err := app.events.findByWeek(week)
 	if err != nil {
-		sendResponse(w, http.StatusOK, nil)
+		sendError(w, http.StatusOK, nil)
 		return
 	}
 
@@ -214,18 +214,18 @@ func (app *application) getEventsForMonth(w http.ResponseWriter, r *http.Request
 
 	weekStr, ok := r.URL.Query()["month"]
 	if !ok {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	week, err := time.Parse("2006-01-02", weekStr[0])
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	events, err := app.events.findByMonth(week)
 	if err != nil {
-		sendResponse(w, http.StatusOK, nil)
+		sendError(w, http.StatusOK, nil)
 		return
 	}
 
@@ -240,18 +240,18 @@ func (app *application) getEventsForYear(w http.ResponseWriter, r *http.Request)
 
 	yearStr, ok := r.URL.Query()["year"]
 	if !ok {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 	year, err := strconv.Atoi(yearStr[0])
 	if err != nil {
-		sendResponse(w, http.StatusBadRequest, nil)
+		sendError(w, http.StatusBadRequest, nil)
 		return
 	}
 
 	events, err := app.events.findByYear(year)
 	if err != nil {
-		sendResponse(w, http.StatusOK, nil)
+		sendError(w, http.StatusOK, nil)
 		return
 	}
 
@@ -266,6 +266,21 @@ func sendResponse(w http.ResponseWriter, code int, data interface{}) {
 		Result interface{} `json:"result"`
 	}{
 		Result: data,
+	}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+}
+
+func sendError(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(code)
+
+	response := struct {
+		Error interface{} `json:"error"`
+	}{
+		Error: data,
 	}
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
