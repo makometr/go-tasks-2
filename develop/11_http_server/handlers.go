@@ -1,19 +1,35 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func (app *application) getEvent(w http.ResponseWriter, r *http.Request) {
-	eventID, ok := r.URL.Query()["id"]
-	if !ok {
-		encoder := json.NewEncoder(w)
-		encoder.Encode(app.events.data)
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
 		return
 	}
-	fmt.Fprintf(w, "get event %v\n", eventID)
+
+	eventIDs, ok := r.URL.Query()["id"]
+	if !ok {
+		sendResponse(w, http.StatusOK, app.events.data)
+		return
+	}
+	eventID, err := strconv.Atoi(eventIDs[0])
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	index, err := app.events.findIndex(eventID)
+	if err != nil {
+		sendResponse(w, http.StatusOK, nil)
+		return
+	}
+
+	sendResponse(w, http.StatusOK, app.events.data[index])
 }
 
 type DataToAddNewEvent struct {
@@ -23,17 +39,28 @@ type DataToAddNewEvent struct {
 }
 
 func (app *application) AddEvent(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var t DataToAddNewEvent
-	err := decoder.Decode(&t)
-	if err != nil {
-		panic(err)
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
 	}
 
-	app.events.addEvent(t)
+	var t DataToAddNewEvent
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	ID, err := app.events.addEvent(t)
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+	}
+
+	sendResponse(w, http.StatusOK, struct {
+		ID int `json:"id"`
+	}{ID: ID})
 }
 
-type DateToUpdateEvent struct {
+type DataToUpdateEvent struct {
 	ID     int    `json:"id"`
 	UserID int    `json:"user_id"`
 	Name   string `json:"name"`
@@ -41,18 +68,35 @@ type DateToUpdateEvent struct {
 }
 
 func (app *application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var t DateToUpdateEvent
-	err := decoder.Decode(&t)
-	if err != nil {
-		panic(err)
+	if r.Method != http.MethodPut {
+		http.NotFound(w, r)
+		return
 	}
 
-	index, err := app.events.findIndex(t.ID)
+	var t DataToUpdateEvent
+	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		panic(err)
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
 	}
-	app.events.data[index] = Event{ID: t.ID, Name: t.Name, UserID: t.UserID, Date: CalendarDay{}}
+
+	ctx := context.Background()
+	if t.Name != "" {
+		ctx = context.WithValue(ctx, name, t.Name)
+	}
+	if t.UserID != 0 {
+		ctx = context.WithValue(ctx, userID, t.UserID)
+	}
+	if t.Date != "" {
+		ctx = context.WithValue(ctx, date, t.Date)
+	}
+
+	updated, err := app.events.updateEvent(t.ID, ctx)
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	sendResponse(w, http.StatusOK, updated)
 }
 
 type DataToDeleteEvent struct {
@@ -60,15 +104,37 @@ type DataToDeleteEvent struct {
 }
 
 func (app *application) DeleteEvent(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var t DataToDeleteEvent
-	err := decoder.Decode(&t)
-	if err != nil {
-		panic(err)
+	if r.Method != http.MethodDelete {
+		http.NotFound(w, r)
+		return
 	}
 
-	err = app.events.DeleteEvent(t.ID)
+	var t DataToDeleteEvent
+	err := json.NewDecoder(r.Body).Decode(&t)
 	if err != nil {
-		panic(err)
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	deleted, err := app.events.DeleteEvent(t.ID)
+	if err != nil {
+		sendResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+	sendResponse(w, http.StatusOK, deleted)
+}
+
+func sendResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(code)
+
+	response := struct {
+		Result interface{} `json:"result"`
+	}{
+		Result: data,
+	}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
