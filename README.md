@@ -31,7 +31,7 @@ Tasks stage #2
 - [x] Поиск анаграмм по словарю
 - [ ] Grep
 - [ ] Cut
-- [ ] Or channel
+- [x] Or channel
 - [ ] Взаимодействеие с OS
 - [ ] Wget
-- [ ] HTTTP Server REST
+- [x] HTTTP Server REST
