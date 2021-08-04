@@ -31,7 +31,9 @@ func main() {
 		log.Fatalf("error while connecting %v", err)
 	}
 	defer func() {
-		client.closeConnection()
+		if err := client.closeConnection(); err != nil {
+			log.Fatalf("error while closing conn")
+		}
 	}()
 
 	signals := make(chan os.Signal, 1)
@@ -64,7 +66,7 @@ func main() {
 		}
 	}()
 
-	closed := make(chan interface{}, 0)
+	closed := make(chan interface{})
 	go func() {
 		defer close(closed)
 		for {

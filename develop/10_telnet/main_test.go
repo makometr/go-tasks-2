@@ -19,8 +19,14 @@ func TestTelnetClient(t *testing.T) {
 			defer wg.Done()
 
 			client := NewTelnetClient(l.Addr().String(), time.Second*1)
-			client.initConnection()
-			defer client.closeConnection()
+			if err := client.initConnection(); err != nil {
+				t.Errorf(err.Error())
+			}
+			defer func() {
+				if err := client.closeConnection(); err != nil {
+					t.Errorf(err.Error())
+				}
+			}()
 
 			if err := client.sendMsg("hello\n"); err != nil {
 				t.Errorf("error! send msg should not provied error")

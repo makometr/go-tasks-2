@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// TelnetClient do basic support of sending and receiving via telnet
 type TelnetClient struct {
 	address    string
 	timeout    time.Duration
@@ -15,6 +16,7 @@ type TelnetClient struct {
 	connReader *bufio.Reader
 }
 
+// NewTelnetClient creates instance of TelnetClient
 func NewTelnetClient(address string, timeout time.Duration) *TelnetClient {
 	res := &TelnetClient{
 		address: address,
