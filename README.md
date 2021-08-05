@@ -33,6 +33,6 @@ Tasks stage #2
 - [ ] Cut
 - [x] Or channel
 - [ ] Взаимодействеие с OS
-- [ ] Wget
+- [x] Wget
 - [x] Telnet
 - [x] HTTTP Server REST
