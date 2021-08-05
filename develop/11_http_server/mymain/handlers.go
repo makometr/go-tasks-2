@@ -1,4 +1,4 @@
-package main
+package mymain
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (app *application) getEvent(w http.ResponseWriter, r *http.Request) {
+func (app *Application) getEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.NotFound(w, r)
 		return
@@ -49,7 +49,7 @@ func (d DataToAddNewEvent) isValid() bool {
 	return true
 }
 
-func (app *application) AddEvent(w http.ResponseWriter, r *http.Request) {
+func (app *Application) AddEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.NotFound(w, r)
 		return
@@ -93,7 +93,7 @@ func (d DataToUpdateEvent) isValid() bool {
 	return true
 }
 
-func (app *application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
+func (app *Application) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		http.NotFound(w, r)
 		return
@@ -133,7 +133,7 @@ type DataToDeleteEvent struct {
 	ID int `json:"id"`
 }
 
-func (app *application) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+func (app *Application) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		http.NotFound(w, r)
 		return
@@ -154,7 +154,7 @@ func (app *application) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	sendResponse(w, http.StatusOK, deleted)
 }
 
-func (app *application) getEventsForDay(w http.ResponseWriter, r *http.Request) {
+func (app *Application) getEventsForDay(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.NotFound(w, r)
 		return
@@ -180,7 +180,7 @@ func (app *application) getEventsForDay(w http.ResponseWriter, r *http.Request) 
 	sendResponse(w, http.StatusOK, events)
 }
 
-func (app *application) getEventsForWeek(w http.ResponseWriter, r *http.Request) {
+func (app *Application) getEventsForWeek(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.NotFound(w, r)
 		return
@@ -206,7 +206,7 @@ func (app *application) getEventsForWeek(w http.ResponseWriter, r *http.Request)
 	sendResponse(w, http.StatusOK, events)
 }
 
-func (app *application) getEventsForMonth(w http.ResponseWriter, r *http.Request) {
+func (app *Application) getEventsForMonth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.NotFound(w, r)
 		return
@@ -232,7 +232,7 @@ func (app *application) getEventsForMonth(w http.ResponseWriter, r *http.Request
 	sendResponse(w, http.StatusOK, events)
 }
 
-func (app *application) getEventsForYear(w http.ResponseWriter, r *http.Request) {
+func (app *Application) getEventsForYear(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.NotFound(w, r)
 		return

@@ -1,4 +1,4 @@
-package main
+package mymain
 
 type DataManipulator interface {
 	openConnection() ([]Event, error)
