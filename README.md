@@ -34,4 +34,5 @@ Tasks stage #2
 - [x] Or channel
 - [ ] Взаимодействеие с OS
 - [ ] Wget
+- [x] Telnet
 - [x] HTTTP Server REST
