@@ -24,12 +24,16 @@ func (db *fileDB) openConnection() ([]Event, error) {
 	}
 
 	decoder := json.NewDecoder(ptr)
-	decoder.Token()
+	if _, err := decoder.Token(); err != nil {
+		return []Event{}, nil
+	}
 	var events []Event
 
 	for decoder.More() {
 		var e Event
-		decoder.Decode(&e)
+		if err := decoder.Decode(&e); err != nil {
+			return []Event{}, err
+		}
 		events = append(events, e)
 	}
 
@@ -42,7 +46,9 @@ func (db *fileDB) closeConnction(data []Event) error {
 	if err := db.filePtr.Truncate(0); err != nil {
 		return err
 	}
-	db.filePtr.Seek(0, 0)
+	if _, err := db.filePtr.Seek(0, 0); err != nil {
+		return err
+	}
 
 	encoder := json.NewEncoder(db.filePtr)
 	fmt.Println("Write to file db!!", db.filePtr)
