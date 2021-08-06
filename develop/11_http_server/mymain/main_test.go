@@ -1,14 +1,22 @@
 package mymain
 
 import (
+	"bytes"
 	"config"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"testing"
 )
 
 var app Application
+
+func checkResponseCode(t *testing.T, expected, actual int) {
+	if expected != actual {
+		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
+	}
+}
 
 func TestMain(m *testing.M) {
 	cfg := config.NewTestConfig()
@@ -30,216 +38,12 @@ func Test_application_getEvent(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	app.getEvent(response, request)
+	checkResponseCode(t, http.StatusOK, response.Code)
 
-	got := response.Body.String()
-	want := "[]"
+	want := bytes.TrimSuffix(response.Body.Bytes(), []byte{10})
+	expected := []byte(`{"result":[]}`)
 
-	if got != want {
-		t.Errorf("got %q, want %q", got, want)
-	}
-}
-
-func TestDataToAddNewEvent_isValid(t *testing.T) {
-	tests := []struct {
-		name string
-		d    DataToAddNewEvent
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.d.isValid(); got != tt.want {
-				t.Errorf("DataToAddNewEvent.isValid() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_application_AddEvent(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.AddEvent(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func TestDataToUpdateEvent_isValid(t *testing.T) {
-	tests := []struct {
-		name string
-		d    DataToUpdateEvent
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.d.isValid(); got != tt.want {
-				t.Errorf("DataToUpdateEvent.isValid() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_application_UpdateEvent(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.UpdateEvent(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func Test_application_DeleteEvent(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.DeleteEvent(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func Test_application_getEventsForDay(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.getEventsForDay(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func Test_application_getEventsForWeek(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.getEventsForWeek(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func Test_application_getEventsForMonth(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.getEventsForMonth(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func Test_application_getEventsForYear(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		app  *Application
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.app.getEventsForYear(tt.args.w, tt.args.r)
-		})
-	}
-}
-
-func Test_sendResponse(t *testing.T) {
-	type args struct {
-		w    http.ResponseWriter
-		code int
-		data interface{}
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			sendResponse(tt.args.w, tt.args.code, tt.args.data)
-		})
-	}
-}
-
-func Test_sendError(t *testing.T) {
-	type args struct {
-		w    http.ResponseWriter
-		code int
-		data interface{}
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			sendError(tt.args.w, tt.args.code, tt.args.data)
-		})
+	if !reflect.DeepEqual(expected, want) {
+		t.Errorf("Expected %v array. Got %v", expected, want)
 	}
 }
