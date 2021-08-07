@@ -4,12 +4,12 @@ Tasks stage #2
 
 ## Паттерны проектирования
 
-- [ ] Facade
+- [x] Facade
 - [x] Builder
 - [ ] Visitor
 - [ ] Command
-- [ ] Chain Responsibility
-- [ ] Factory Method
+- [x] Chain Responsibility
+- [x] Factory Method
 - [ ] Strategy
 - [ ] State
 
