@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -28,20 +29,12 @@ var params parametres
 
 func main() {
 	params = parseArgsIntoParams()
-	fmt.Println(params)
 	data, err := readDataFromFile(params.filename)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println(data)
 
 	doGrep(data, params, os.Stdout)
-
-	// data = doSort(data, params)
-	// for _, str := range data {
-	// 	fmt.Println(str)
-	// }
-
 }
 
 func parseArgsIntoParams() parametres {
@@ -107,8 +100,14 @@ func doGrep(data []string, params parametres, out io.Writer) {
 		return
 	}
 
-	for _, i := range indices {
-		fmt.Fprintf(out, data[i])
+	indices = addAreaIndices(indices, params, len(data))
+
+	for i, index := range indices {
+		if i != len(indices)-1 {
+			fmt.Fprintf(out, "%s\n", data[index])
+		} else {
+			fmt.Fprintf(out, "%s", data[index])
+		}
 	}
 }
 
@@ -156,4 +155,37 @@ func findIndices(data []string, params parametres) []int {
 	}
 
 	return indices
+}
+
+func addAreaIndices(inds []int, params parametres, maxIndex int) []int {
+	if params.after == 0 && params.before == 0 {
+		return inds
+	}
+
+	unique := make(map[int]struct{})
+	for _, index := range inds {
+		unique[index] = struct{}{}
+
+		for i := 1; i <= params.before; i++ {
+			newIndex := index - i
+			if newIndex >= 0 {
+				unique[newIndex] = struct{}{}
+			}
+		}
+
+		for i := 1; i <= params.after; i++ {
+			newIndex := index + i
+			if newIndex < maxIndex {
+				unique[newIndex] = struct{}{}
+			}
+		}
+	}
+
+	newIndices := make([]int, 0, len(unique))
+	for key := range unique {
+		newIndices = append(newIndices, key)
+	}
+	sort.Ints(newIndices)
+
+	return newIndices
 }

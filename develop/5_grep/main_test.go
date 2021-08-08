@@ -4,38 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 )
 
-func Test_readDataFromFile(t *testing.T) {
-	type args struct {
-		name string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    []string
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := readDataFromFile(tt.args.name)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("readDataFromFile() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("readDataFromFile() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func readFile(filename string) []string {
+func readFileOrPanic(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
@@ -66,23 +39,23 @@ func Test_doGrep(t *testing.T) {
 		{
 			name: "default Find USD",
 			args: args{
-				data:   readFile("testFiles/default_1.txt"),
+				data:   readFileOrPanic("testFiles/default_1.txt"),
 				params: parametres{pattern: "USD"},
 			},
-			wantOut: strings.Join(readFile("testFiles/default_1_ans.txt"), "\n"),
+			wantOut: strings.Join(readFileOrPanic("testFiles/default_1_ans.txt"), "\n"),
 		},
 		{
 			name: "default Find last eur (eur$)",
 			args: args{
-				data:   readFile("testFiles/default_2.txt"),
+				data:   readFileOrPanic("testFiles/default_2.txt"),
 				params: parametres{pattern: "eur$"},
 			},
-			wantOut: strings.Join(readFile("testFiles/default_2_ans.txt"), "\n"),
+			wantOut: strings.Join(readFileOrPanic("testFiles/default_2_ans.txt"), "\n"),
 		},
 		{
 			name: "default_1 Count",
 			args: args{
-				data:   readFile("testFiles/default_1.txt"),
+				data:   readFileOrPanic("testFiles/default_1.txt"),
 				params: parametres{pattern: "u", toCount: true},
 			},
 			wantOut: "3\n",
@@ -90,7 +63,7 @@ func Test_doGrep(t *testing.T) {
 		{
 			name: "default_1 Count_ignore_case",
 			args: args{
-				data:   readFile("testFiles/default_2.txt"),
+				data:   readFileOrPanic("testFiles/default_2.txt"),
 				params: parametres{pattern: "usd", toCount: true, ignoreCase: true},
 			},
 			wantOut: "4\n",
@@ -98,7 +71,7 @@ func Test_doGrep(t *testing.T) {
 		{
 			name: "default_1 Count_ignore_case",
 			args: args{
-				data:   readFile("testFiles/default_2.txt"),
+				data:   readFileOrPanic("testFiles/default_2.txt"),
 				params: parametres{pattern: "usd", toCount: true, ignoreCase: true, invert: true},
 			},
 			wantOut: "2\n",
@@ -106,19 +79,43 @@ func Test_doGrep(t *testing.T) {
 		{
 			name: "fixed no pattern",
 			args: args{
-				data:   readFile("testFiles/default_2.txt"),
+				data:   readFileOrPanic("testFiles/default_2.txt"),
 				params: parametres{pattern: "byn$", fixed: true},
 			},
 			wantOut: "",
 		},
 		// check output flags -A -B -C -n
 		{
-			name: "fixed no pattern",
+			name: "out -c ",
 			args: args{
-				data:   readFile("testFiles/out.txt"),
+				data:   readFileOrPanic("testFiles/out.txt"),
 				params: parametres{pattern: "bitoc$", after: 2, before: 2},
 			},
-			wantOut: strings.Join(readFile("testFiles/out_c_ans.txt"), "\n"),
+			wantOut: strings.Join(readFileOrPanic("testFiles/out_c_ans.txt"), "\n"),
+		},
+		{
+			name: "out -C ",
+			args: args{
+				data:   readFileOrPanic("testFiles/out.txt"),
+				params: parametres{pattern: "bitoc$", after: 2, before: 2},
+			},
+			wantOut: strings.Join(readFileOrPanic("testFiles/out_c_ans.txt"), "\n"),
+		},
+		{
+			name: "out -B first line",
+			args: args{
+				data:   readFileOrPanic("testFiles/out.txt"),
+				params: parametres{pattern: "USD", before: 2},
+			},
+			wantOut: strings.Join(readFileOrPanic("testFiles/out_b_ans.txt"), "\n"),
+		},
+		{
+			name: "out -A last line",
+			args: args{
+				data:   readFileOrPanic("testFiles/out.txt"),
+				params: parametres{pattern: "bitoc byn", after: 2},
+			},
+			wantOut: strings.Join(readFileOrPanic("testFiles/out_a_ans.txt"), "\n"),
 		},
 	}
 	for _, tt := range tests {
