@@ -29,7 +29,7 @@ Tasks stage #2
 - [x] Распаковка
 - [x] Sort
 - [x] Поиск анаграмм по словарю
-- [ ] Grep
+- [x] Grep
 - [ ] Cut
 - [x] Or channel
 - [ ] Взаимодействеие с OS
