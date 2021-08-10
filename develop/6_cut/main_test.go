@@ -8,8 +8,10 @@ import (
 	"testing"
 )
 
+var testDataDir string = "testdata"
+
 func readFileOrPanic(filename string) []string {
-	file, err := os.Open(filename)
+	file, err := os.Open(testDataDir + "/" + filename)
 	if err != nil {
 		panic(err)
 	}
