@@ -2,7 +2,10 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"os"
+	"strings"
+	"testing"
 )
 
 func readFileOrPanic(filename string) []string {
@@ -23,32 +26,48 @@ func readFileOrPanic(filename string) []string {
 	return lines
 }
 
-// func Test_doGrep(t *testing.T) {
-// 	type args struct {
-// 		data   []string
-// 		params parametres
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		args    args
-// 		wantOut string
-// 	}{
-// 		{
-// 			name: "default Find USD",
-// 			args: args{
-// 				data:   readFileOrPanic("testFiles/default_1.txt"),
-// 				params: parametres{pattern: "USD"},
-// 			},
-// 			wantOut: strings.Join(readFileOrPanic("testFiles/default_1_ans.txt"), "\n"),
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			out := &bytes.Buffer{}
-// 			doGrep(tt.args.data, tt.args.params, out)
-// 			if gotOut := out.String(); gotOut != tt.wantOut {
-// 				t.Errorf("doGrep() = %v, want %v", gotOut, tt.wantOut)
-// 			}
-// 		})
-// 	}
-// }
+func Test_doGrep(t *testing.T) {
+	type args struct {
+		data   []string
+		params parametres
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut string
+	}{
+		{
+			name: "Delim space First column",
+			args: args{
+				data:   readFileOrPanic("file.txt"),
+				params: parametres{delim: " ", fields: []int{0}},
+			},
+			wantOut: strings.Join(readFileOrPanic("file_ans_1.txt"), "\n"),
+		},
+		{
+			name: "Delim space First column",
+			args: args{
+				data:   readFileOrPanic("file.txt"),
+				params: parametres{delim: ":", fields: []int{0, 1}, withDelimOnly: true},
+			},
+			wantOut: strings.Join(readFileOrPanic("file_ans_2.txt"), "\n"),
+		},
+		{
+			name: "Delim space First column",
+			args: args{
+				data:   readFileOrPanic("file.txt"),
+				params: parametres{delim: " ", fields: []int{0, 1, 2}, withDelimOnly: true},
+			},
+			wantOut: strings.Join(readFileOrPanic("file_ans_3.txt"), "\n"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out := &bytes.Buffer{}
+			doCut(tt.args.data, tt.args.params, out)
+			if gotOut := out.String()[:len(out.String())-1]; gotOut != tt.wantOut {
+				t.Errorf("doGrep() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
