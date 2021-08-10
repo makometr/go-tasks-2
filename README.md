@@ -6,8 +6,8 @@ Tasks stage #2
 
 - [x] Facade
 - [x] Builder
-- [ ] Visitor
-- [ ] Command
+- [x] Visitor
+- [x] Command
 - [x] Chain Responsibility
 - [x] Factory Method
 - [ ] Strategy
@@ -30,7 +30,7 @@ Tasks stage #2
 - [x] Sort
 - [x] Поиск анаграмм по словарю
 - [x] Grep
-- [ ] Cut
+- [x] Cut
 - [x] Or channel
 - [ ] Взаимодействеие с OS
 - [x] Wget
