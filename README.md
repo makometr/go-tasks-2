@@ -10,8 +10,8 @@ Tasks stage #2
 - [x] Command
 - [x] Chain Responsibility
 - [x] Factory Method
-- [ ] Strategy
-- [ ] State
+- [x] Strategy
+- [x] State
 
 ## Чтение и понимание кода
 
@@ -32,7 +32,7 @@ Tasks stage #2
 - [x] Grep
 - [x] Cut
 - [x] Or channel
-- [ ] Взаимодействеие с OS
+- [x] Взаимодействеие с OS
 - [x] Wget
 - [x] Telnet
 - [x] HTTTP Server REST
