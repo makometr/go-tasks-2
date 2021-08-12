@@ -3,6 +3,7 @@ package mymain
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +15,7 @@ func (app *Application) getEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("server:", r.URL.Query())
 	eventIDs, ok := r.URL.Query()["id"]
 	if !ok {
 		sendResponse(w, http.StatusOK, app.events.data)

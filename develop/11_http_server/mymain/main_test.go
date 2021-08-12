@@ -1,8 +1,9 @@
 package mymain
 
 import (
-	"bytes"
 	"config"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -24,12 +25,8 @@ func TestMain(m *testing.M) {
 	app.initHTTPServer(cfg)
 	defer app.Shutdown()
 
-	// Run tests
 	exitVal := m.Run()
 
-	// Write code here to run after tests
-
-	// Exit with exit value from tests
 	os.Exit(exitVal)
 }
 
@@ -40,10 +37,47 @@ func Test_application_getEvent(t *testing.T) {
 	app.getEvent(response, request)
 	checkResponseCode(t, http.StatusOK, response.Code)
 
-	want := bytes.TrimSuffix(response.Body.Bytes(), []byte{10})
-	expected := []byte(`{"result":[]}`)
+	eventsGot := struct {
+		Result []Event `json:"result"`
+	}{}
+	err := json.Unmarshal(response.Body.Bytes(), &eventsGot)
+	if err != nil {
+		t.Errorf("JSON invalid")
+	}
 
-	if !reflect.DeepEqual(expected, want) {
-		t.Errorf("Expected %v array. Got %v", expected, want)
+	eventsExpected := []Event{
+		{ID: 1, UserID: 100, Name: "first", Date: "2020-04-30"},
+		{ID: 2, UserID: 100, Name: "second", Date: "2021-05-20"},
+		{ID: 3, UserID: 200, Name: "thrid", Date: "2021-07-10"},
+	}
+
+	if !reflect.DeepEqual(eventsExpected, eventsGot.Result) {
+		t.Errorf("Expected %v array. Got %v", eventsExpected, eventsGot)
+	}
+}
+
+func Test_application_getEventByID(t *testing.T) {
+	request, _ := http.NewRequest(http.MethodGet, "/event", nil)
+	q := request.URL.Query()
+	q.Add("id", "3")
+	request.URL.RawQuery = q.Encode()
+	response := httptest.NewRecorder()
+
+	app.getEvent(response, request)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	eventsGot := struct {
+		Result Event `json:"result"`
+	}{}
+	err := json.Unmarshal(response.Body.Bytes(), &eventsGot)
+	if err != nil {
+		t.Errorf("JSON invalid")
+	}
+	fmt.Println(eventsGot)
+
+	eventsExpected := Event{ID: 3, UserID: 200, Name: "thrid", Date: "2021-07-10"}
+
+	if !reflect.DeepEqual(eventsExpected, eventsGot.Result) {
+		t.Errorf("Expected %v array. Got %v", eventsExpected, eventsGot)
 	}
 }
