@@ -8,6 +8,12 @@ import "fmt"
 // Сама подсистема не знает о существовании Фасада. Классы подсистемы общаются друг с другом напрямую.
 
 // Также можно использовать для разложения подсистемы на отдельные слои.
+// Фасад помогает
+
+var cheezeStandartName = "Parmezan"
+var chickenSize = 0.6
+var beafSize = 0.4
+var stRadius = 10
 
 type makePizzaFacade struct {
 	cheezer *cheezeSlicer
@@ -17,9 +23,9 @@ type makePizzaFacade struct {
 
 func newPizzaFacade() *makePizzaFacade {
 	return &makePizzaFacade{
-		cheezer: &cheezeSlicer{"Parmezan"},
-		meeter:  &meetCooker{chicken: 0.6, beaf: 0.4},
-		dougher: &doughMaker{radius: 10},
+		cheezer: &cheezeSlicer{cheezeStandartName},
+		meeter:  &meetCooker{chicken: float32(chickenSize), beaf: float32(beafSize)},
+		dougher: &doughMaker{radius: stRadius},
 	}
 }
 

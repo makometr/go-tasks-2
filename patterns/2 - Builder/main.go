@@ -28,19 +28,24 @@ type APIparserBuilder interface {
 func main() {
 	parsers := make([]APIparser, 0, 2)
 
-	// Эту часть можно выделить и делегировать директору (распорядителю)
-	var mgu MGUparserBuilder
-	mgu.setDBConnection("k8s.maria-db.shark.us")
-	mgu.setcConfigure([]string{"8s", "5s", "3KB", "100"})
-	mgu.setLogFile("mgu_log_pasrser.txt")
-	parsers = append(parsers, mgu.Build())
+	flag := false
 
-	// Эту часть можно выделить и делегировать директору (распорядителю)
-	var misis MGUparserBuilder
-	misis.setDBConnection("k8s.maria-db.shark.us")
-	misis.setcConfigure([]string{"8s", "5s", "3KB", "100"})
-	misis.setLogFile("mgu_log_pasrser.txt")
-	parsers = append(parsers, misis.Build())
+	if flag {
+
+		// Эту часть можно выделить и делегировать директору (распорядителю)
+		var mgu MGUparserBuilder
+		mgu.setDBConnection("k8s.maria-db.shark.us")
+		mgu.setcConfigure([]string{"8s", "5s", "3KB", "100"})
+		mgu.setLogFile("mgu_log_pasrser.txt")
+		parsers = append(parsers, mgu.Build())
+	} else {
+		// Эту часть можно выделить и делегировать директору (распорядителю)
+		var misis MGUparserBuilder
+		misis.setDBConnection("k8s.maria-db.shark.us")
+		misis.setcConfigure([]string{"8s", "5s", "3KB", "100"})
+		misis.setLogFile("mgu_log_pasrser.txt")
+		parsers = append(parsers, misis.Build())
+	}
 
 	for parser := range parsers {
 		fmt.Println(parser)

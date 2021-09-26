@@ -1,8 +1,9 @@
 package main
 
 // Порождающий паттерн
-// определяет общий интерфейс для создания объектов в базовом классе
+// определяет общий интерфейс для создания объектов
 // А подклассы изменяют тип создаваемых объектов.
+// Делегирует операцию создания экземпляра
 
 // способ скрыть логику создания создаваемых экземпляров.
 
@@ -15,6 +16,7 @@ type viewCounter interface {
 	getUrl() string
 }
 
+// Создаем объекты без знания их внутренней реализации
 func getCounterView(viewType string, url string) viewCounter {
 	switch viewType {
 	case "vk":
@@ -26,5 +28,6 @@ func getCounterView(viewType string, url string) viewCounter {
 }
 
 func main() {
-
+	counter := getCounterView("vk", "/makometr")
+	counter.getTotalViews()
 }
