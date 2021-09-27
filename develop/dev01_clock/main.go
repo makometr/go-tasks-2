@@ -1,6 +1,7 @@
 package basedevelop
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/makometr/go-tasks-2/develop/dev01_clock/wbtimer"
@@ -8,14 +9,11 @@ import (
 
 // PrintCurrentTime prints curremt time from remote server
 func PrintCurrentTime() {
-	var c wbtimer.Clock
-	// c, err := clock.New(clock.BaseHost)
-	// wbtimer.Clock
-	var err error
+	c, err := wbtimer.New(wbtimer.BaseHost)
 
 	if err != nil {
 		log.Fatalln("Error!", err)
 	}
 
-	// fmt.Println("Current time:", c.CurrentTime())
+	fmt.Println(c.CurrentTime())
 }
