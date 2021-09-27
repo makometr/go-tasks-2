@@ -1,4 +1,4 @@
-module go-tasks-2/develop/dev01_clock/wbtimer
+module github.com/makometr/go-tasks-2/develop/dev01_clock/wbtimer
 
 go 1.16
 
