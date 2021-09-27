@@ -8,6 +8,8 @@ import (
 	"unicode/utf8"
 )
 
+const backslashCode = 92
+
 func main() {
 
 }
@@ -35,7 +37,7 @@ func unpakcing(str string) (string, error) {
 
 func getCodePair(str string, index int) (codePair, int, error) {
 	word, wordSize := utf8.DecodeRuneInString(str[index:])
-	if !unicode.IsLetter(word) && int(word) != 92 {
+	if !unicode.IsLetter(word) && int(word) != backslashCode {
 		return codePair{}, 0, fmt.Errorf("not expexted %d %c", word, word)
 	}
 
